@@ -1,28 +1,3 @@
-<!-- ## Usage
-
-This package provides two middlewares for APM functionality:
-
-1. `apm-metrics`: Collects metrics for each request
-2. `apm-tracing`: Creates a span for each request and adds basic HTTP information
-
-You can add these middlewares to your routes or middleware groups in your Laravel application:
-
-```php
-// In app/Http/Kernel.php
-
-protected $middlewareGroups = [
-    'web' => [
-        // ... other middlewares
-        \Middleware\LaravelApm\Middleware\MetricsMiddleware::class,
-        \Middleware\LaravelApm\Middleware\TracingMiddleware::class,
-    ],
-];
-
-// Or for specific routes in your routes file:
-Route::middleware(['apm-metrics', 'apm-tracing'])->group(function () {
-    // Your routes here
-}); -->
-
 # Laravel APM
 
 This guide will walk you through the process of installing and configuring our Laravel apm package in your project.
@@ -37,13 +12,37 @@ This guide will walk you through the process of installing and configuring our L
 
 To install the package, follow these steps:
 
-1. Install the package using Composer:
+1. Install Middleware Host Agent (If not already installed), see our [Installation Guide.](https://docs.middleware.io/agent-installation/overview)
+
+
+2. Install the package using Composer:
 
    ```bash
    composer require Middleware/laravel-apm
    ```
 
-2. Add the service provider to the `providers` array in `config/app.php`:
+3. Install Opentelemetry extension:
+    ```bash
+    sudo pecl install channel://pecl.php.net/opentelemetry-1.0.0beta3
+    ```
+
+4. Add the extension to your php.ini file.
+    - To find loaded php.ini file, run:
+        ```bash
+        php --ini
+        ```
+    - You'll see file path under "Loaded Configuration File:" attribute.
+    - Add following lines in the file:
+        ```bash
+        [opentelemetry]
+        extension=opentelemetry.so
+        ``` 
+    - Verify if extension is installed:
+        ```bash
+        php -m | grep opentelemetry
+        ```
+
+5. Add the service provider to the `providers` array in `config/app.php`:
     
     ```bash
     'providers' => [
@@ -52,7 +51,7 @@ To install the package, follow these steps:
     ],
     ```
 
-3. Publish the package configuration:
+6. Publish the package configuration:
 
     ```bash
     php artisan vendor:publish --provider="Middleware\LaravelAPM\LaravelAPMServiceProvider"
@@ -116,4 +115,4 @@ For enabling traces-related metrics, follow these steps:
     ];
     ```
 
-2. If you have enabled tracing, then add this middleware after tracing.
+3. If you have enabled tracing, then add this middleware after tracing.
